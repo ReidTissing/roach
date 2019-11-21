@@ -5,6 +5,20 @@ import argparse
 import imutils
 import time
 import cv2
+import json
+from time import sleep
+
+data = {}
+data['coord'] = []
+#method to log to json
+def logit(time,x,y):
+    data['coord'].append({
+    'time': timer,
+    'x': x,
+    'y': y
+    })
+    with open('xylog.txt', 'w') as outfile:
+        json.dump(data, outfile)
 
 # construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -58,7 +72,7 @@ else:
 # initialize the FPS throughput estimator
 fps = None
 # loop over frames from the video stream
-time = 0
+timer = 0
 while True:
 
     # grab the current frame, then handle if we are using a
@@ -74,7 +88,7 @@ while True:
     # frame dimensions
     frame = imutils.resize(frame, width=500)
     (H, W) = frame.shape[:2]
-    time = time + 1
+    timer = timer + 1
     # check to see if we are currently tracking an object
     if initBB is not None:
         # grab the new bounding box coordinates of the object
@@ -85,7 +99,10 @@ while True:
             (x, y, w, h) = [int(v) for v in box]
             cv2.rectangle(frame, (x, y), (x + w, y + h),
                           (0, 255, 0), 2)
-            print("time is: " + str(time) + "x is " + str(x) + " y is " + str(y))
+            print("time is: " + str(timer) + "x is " + str(x) + " y is " + str(y))
+            # if (time % 4) == 0:
+            time.sleep(2)
+            logit(timer,x,y)
 
         # update the FPS counter
         fps.update()
